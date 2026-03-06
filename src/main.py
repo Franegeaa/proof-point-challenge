@@ -3,6 +3,8 @@ import re
 from datetime import datetime
 
 INPUT_FILE = "input/episodes.csv"
+OUTPUT_FILE = "output/episodes_clean.csv"
+REPORT_FILE = "output/report.md"
 
 def normalize_text(value):
     if not value:
@@ -18,6 +20,35 @@ def normalize_compare(value):
     value = value.strip()
     value = re.sub(r"\s+", " ", value)
     return value
+
+def write_csv(records):
+
+    with open(OUTPUT_FILE, "w", newline="", encoding="utf-8") as f:
+
+        writer = csv.DictWriter(
+            f,
+            fieldnames=[
+                "SeriesName",
+                "SeasonNumber",
+                "EpisodeNumber",
+                "EpisodeTitle",
+                "AirDate",
+            ],
+        )
+
+        writer.writeheader()
+
+        for r in records:
+            writer.writerow(r)
+
+def write_report(input_count, output_count):
+
+    with open(REPORT_FILE, "w") as f:
+
+        f.write("# Data Quality Report\n\n")
+
+        f.write(f"Input records: {input_count}\n")
+        f.write(f"Output records: {output_count}\n")
 
 def is_duplicate(a, b):
 
@@ -143,13 +174,16 @@ def read_csv(path):
     return filas
 
 def main():
+
     filas = read_csv(INPUT_FILE)
 
-    print(f"Filas antes de deduplicar: {len(filas)}")
+    cleaned = deduplicate(filas)
 
-    deduplicated = deduplicate(filas)
+    write_csv(cleaned)
 
-    print(f"Filas despues de deduplicar: {len(deduplicated)}")
+    write_report(len(filas), len(cleaned))
+
+    print("Procesamiento finalizado")
 
 if __name__ == "__main__":
     main()
