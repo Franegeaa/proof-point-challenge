@@ -1,0 +1,6 @@
+Este es un texto de prueba. Un texto que tiene signos de puntuación como comas, puntos y signos de exclamación!!!
+El programa debe probar probar probar que todo funciona. 
+Debe debe ignorar Mayúsculas y MINÚSCULAS.
+Este texto de prueba de prueba de prueba tiene muchas palabras.
+Tiene palabras como hola, hola, hola!
+¿Qué tal? Qué, qué, qué.

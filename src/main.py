@@ -144,6 +144,8 @@ def deduplicate(records, metrics):
             
     metrics["output_count"] = len(result)
 
+    result.sort(key=lambda r: (r["SeriesName"].lower(), r["SeasonNumber"], r["EpisodeNumber"]))
+
     return result
 
 def should_discard(record):
@@ -171,6 +173,7 @@ def parse_number(value):
 
 def parse_date(value):
     try:
+        value = value.strip()
         datetime.strptime(value, "%Y-%m-%d")
         return value
     except:
