@@ -13,6 +13,61 @@ def normalize_text(value):
 
     return value
 
+def normalize_compare(value):
+    value = value.lower()
+    value = value.strip()
+    value = re.sub(r"\s+", " ", value)
+    return value
+
+def is_duplicate(a, b):
+
+    same_series = normalize_compare(a["SeriesName"]) == normalize_compare(
+        b["SeriesName"]
+    )
+
+    rule1 = (
+        same_series
+        and a["SeasonNumber"] == b["SeasonNumber"]
+        and a["EpisodeNumber"] == b["EpisodeNumber"]
+    )
+
+    rule2 = (
+        same_series
+        and a["EpisodeNumber"] == b["EpisodeNumber"]
+        and normalize_compare(a["EpisodeTitle"])
+        == normalize_compare(b["EpisodeTitle"])
+        and (a["SeasonNumber"] == 0 or b["SeasonNumber"] == 0)
+    )
+
+    rule3 = (
+        same_series
+        and a["SeasonNumber"] == b["SeasonNumber"]
+        and normalize_compare(a["EpisodeTitle"])
+        == normalize_compare(b["EpisodeTitle"])
+        and (a["EpisodeNumber"] == 0 or b["EpisodeNumber"] == 0)
+    )
+
+    return rule1 or rule2 or rule3
+
+def deduplicate(records):
+
+    result = []
+
+    for rec in records:
+
+        duplicate_found = False
+
+        for i, existing in enumerate(result):
+
+            if is_duplicate(existing, rec):
+                duplicate_found = True
+                break
+
+        if not duplicate_found:
+            result.append(rec)
+
+    return result
+
 def should_discard(record):
 
     if record["SeriesName"] == "":
@@ -82,7 +137,7 @@ def read_csv(path):
 
             if should_discard(record):
                 continue
-            
+
             filas.append(record)
 
     return filas
@@ -90,8 +145,11 @@ def read_csv(path):
 def main():
     filas = read_csv(INPUT_FILE)
 
-    print(f"filas procesadas: {len(filas)}")
+    print(f"Filas antes de deduplicar: {len(filas)}")
 
+    deduplicated = deduplicate(filas)
+
+    print(f"Filas despues de deduplicar: {len(deduplicated)}")
 
 if __name__ == "__main__":
     main()
