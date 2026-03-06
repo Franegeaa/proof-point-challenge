@@ -13,6 +13,20 @@ def normalize_text(value):
 
     return value
 
+def should_discard(record):
+
+    if record["SeriesName"] == "":
+        return True
+
+    episode_missing = record["EpisodeNumber"] == 0
+    title_missing = record["EpisodeTitle"] == "Untitled Episode"
+    airdate_missing = record["AirDate"] == "Unknown"
+
+    if episode_missing and title_missing and airdate_missing:
+        return True
+
+    return False
+
 def parse_number(value):
     try:
         n = int(value)
@@ -64,7 +78,12 @@ def read_csv(path):
         reader = csv.reader(archivo)
 
         for fila in reader:
-            filas.append(clean_row(fila))
+            record = clean_row(fila)
+
+            if should_discard(record):
+                continue
+            
+            filas.append(record)
 
     return filas
 
